@@ -5,16 +5,32 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { CalendarAppointment } from "./calendar-appointment";
+import { extractAppointment } from './actions';
+import { type AppointmentDetails } from './schemas';
 
 export default function Page() {
+    const [appointment, setAppointment] = useState<AppointmentDetails | null>(null);
   const [loading, setLoading] = useState(false);
 
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setLoading(true);
-    // extract appointment
+  e.preventDefault();
+  setLoading(true);
+  setAppointment(null); // Clear previous results
+ 
+  const formData = new FormData(e.target as HTMLFormElement);
+  const input = formData.get('appointment') as string;
+ 
+  try {
+    const result = await extractAppointment(input);
+    setAppointment(result);
+  } catch (error) {
+    console.error('Extraction failed:', error);
+    // TODO: Show error to user
+  } finally {
     setLoading(false);
-  };
+  }
+};
 
   return (
     <div className="max-w-lg mx-auto px-4 py-8">
@@ -36,7 +52,7 @@ export default function Page() {
             </form>
           </CardContent>
         </Card>
-        <CalendarAppointment appointment={null} />
+<CalendarAppointment appointment={appointment} />
       </div>
     </div>
   );
