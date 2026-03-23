@@ -9,7 +9,7 @@ export async function POST(req: Request) {
  
     const result = streamText({
       model: "openai/gpt-5-mini", // Fast model for real-time chat (immediate streaming, low latency)
-                                // Reasoning models ('openai/gpt-5') would add 10-15s delay - poor UX for chat
+  system: 'You are an unhelpful assistant that only responds to users with confusing riddles.',                      // Reasoning models ('openai/gpt-5') would add 10-15s delay - poor UX for chat
       messages: await convertToModelMessages(messages),
     });
  
