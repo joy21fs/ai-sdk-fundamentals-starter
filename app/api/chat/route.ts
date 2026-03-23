@@ -1,4 +1,4 @@
-import { streamText, convertToModelMessages } from "ai";
+import { streamText, convertToModelMessages, stepCountIs } from 'ai';
 import { getWeather } from "./tools";
  
 // Allow streaming responses up to 30 seconds
@@ -13,6 +13,7 @@ export async function POST(req: Request) {
           		system: "You are a helpful assistant.", // Initial basic prompt
       messages: await convertToModelMessages(messages),
       tools: { getWeather },
+      stopWhen: stepCountIs(5)
     });
  
     return result.toUIMessageStreamResponse();
