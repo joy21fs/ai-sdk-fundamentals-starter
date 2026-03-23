@@ -14,6 +14,13 @@ import {
 	PromptInputTextarea,
 	PromptInputSubmit,
 } from "@/components/ai-elements/prompt-input";
+import {
+  Tool,
+  ToolContent,
+  ToolHeader,
+  ToolInput,
+  ToolOutput,
+} from "@/components/ai-elements/tool";
  
 export default function Chat() {
 	const [input, setInput] = useState("");
@@ -35,12 +42,32 @@ export default function Chat() {
 							<Message key={message.id} from={message.role}>
 								<MessageContent>
 									{message.role === "assistant" ? (
-										<MessageResponse>
-											{message.parts
-												?.filter((part) => part.type === "text")
-												.map((part) => part.text)
-												.join("")}
-										</MessageResponse> // 👈 Wrap AI messages in MessageResponse
+                    message.parts?.map((part, i) => {
+    switch (part.type) {
+      case "text":
+        return (
+          <MessageResponse key={`${message.id}-${i}`}>
+            {part.text}
+          </MessageResponse>
+        );
+      case "tool-getWeather":  // Tool parts are named "tool-TOOLNAME"
+        // For now, show raw JSON to see what we're working with
+        return (
+          <Tool key={part.toolCallId || `${message.id}-${i}`}>
+        <ToolHeader type={part.type} state={part.state} />
+        <ToolContent>
+          <ToolInput input={part.input} />
+          <ToolOutput
+            output={JSON.stringify(part.output, null, 2)}
+            errorText={part.errorText}
+          />
+        </ToolContent>
+      </Tool>
+    );
+      default:
+        return null;
+    }
+  })
 									) : (
 										message.parts?.map(
 											(part) => part.type === "text" && part.text,
